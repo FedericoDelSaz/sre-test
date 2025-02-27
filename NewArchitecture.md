@@ -18,23 +18,23 @@ Here's the updated architecture incorporating **Dockerization of the backend**:
 
 ### **🗺️ Architecture Diagram**
 
-Aproach 1
+## **Approach 1: Single EKS Cluster**
 
 ```mermaid
 graph TD;
-  
+
   subgraph AWS_Cloud
     subgraph Networking
       A[Amazon Route 53] -->|Failover & Latency Routing| B[ALB/NLB]
     end
-    
+
     subgraph Security
       C[Kong API Gateway] -->|Auth, Rate Limiting| D[AWS WAF]
       D -->|DDoS Protection| E[AWS Shield]
     end
 
     subgraph Compute
-      F[AWS EKS (Kubernetes Cluster)] -->|Containerized Backend| G[Dockerized Microservices]
+      F[AWS EKS] -->|Containerized Backend| G[Dockerized Microservices]
       G -->|Async Processing| H[RabbitMQ]
     end
 
@@ -49,15 +49,16 @@ graph TD;
       N -->|Progressive Delivery| F
     end
   end
-  
+
   A -->|Traffic Control| C
   B --> F
   C --> B
   F --> I
 
+
 ```
 
-approach 2
+## **Approach 2: Dual EKS Clusters (Even/Odd Sprints)**
 
 ```mermaid
 graph TD;
@@ -94,9 +95,12 @@ graph TD;
   end
   
   A -->|Traffic Control| C
-  B -->|Routes Traffic| F1 & F2
+  B -->|Routes Traffic| F1
+  B -->|Routes Traffic| F2
   C --> B
-  F1 & F2 --> I
+  F1 -->|Storage & Backup| I
+  F2 -->|Storage & Backup| I
+
 
 ```
 
@@ -192,7 +196,8 @@ graph TD;
         F2[AWS EKS - Odd Sprint Cluster] -->|Containerized Backend| G2[Dockerized Microservices (Odd)]
         G1 -->|Async Processing| H1[RabbitMQ (Even)]
         G2 -->|Async Processing| H2[RabbitMQ (Odd)]
-        F1 & F2 -->|Dynamic Node Scaling| K[Karpenter Auto-Scaling]
+        F1 -->|Dynamic Node Scaling| K[Karpenter Auto-Scaling]
+        F2 -->|Dynamic Node Scaling| K
       end
     end
 
@@ -212,6 +217,7 @@ graph TD;
   B -->|Routes Traffic| F1 & F2
   C --> B
   F1 & F2 --> I
+
 
 ```
 
