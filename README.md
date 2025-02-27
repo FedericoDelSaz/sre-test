@@ -1,130 +1,113 @@
-## **🚀 HA & Migration Plan**
+# SRE Architecture Test
 
-### **🔹 Phase 1: High Availability (HA) Setup**
-✅ Route 53, AWS WAF & Shield for traffic management and security.  
-✅ Duplicate Document Processor VM & Load Balancer for HA.  
-✅ Zero Downtime Rollouts using Blue-Green Deployment.
+Thank you very much (again!) for your interest in the Site Reliability
+Engineer position at Cabify. We really appreciate the effort you took on
+delivering the Code Test.
 
-### **🔹 Phase 2: Storage Migration**
-✅ Migrate NFS to S3 with lifecycle rules and backups.
+Get yourself comfortable and make sure to double check the test requirements.
 
-### **🔹 Phase 3: Containerization**
-✅ Dockerize applications while keeping them in VMs.
+You will have two weeks of time to complete the test. We would normally
+expect you to work on this no more than 2-3 hours, but you probably have other
+things to do in your life so we want to give you plenty of time in case you want
+to take on the challenge. If you don't, then it's perfectly fine. Just please
+let us know if this is the case.
 
-### **🔹 Phase 4: Migration to EKS (Even Part Only)**
-✅ Deploy **first EKS cluster + Kong API Gateway**.
+If you have any questions about anything, please do not hesitate to ask us: better safe than sorry!
 
-### **🔹 Phase 5: **Monitoring & Logging Implementation**
-✅ Deploy **ELK (or OpenSearch) for log aggregation**.  
-✅ Set up **Instana** for performance monitoring.  
-✅ Enable **Kubernetes native monitoring** (Prometheus + Grafana).
+Looking forward to seeing the results. Good luck!
 
-### **🔹 Phase 6: Kubernetes Optimization**
-✅ Implement:
-- **Karpenter** (autoscaling)
-- **ArgoCD** (GitOps-based CI/CD)
-- **Kyverno** (policy enforcement)
-- **Secret Manager** (secure credentials)
-- **Cert Manager** (TLS certificates)
+### Problem
 
-### **🔹 Phase 7: Full EKS Migration (Add Part)**
-✅ Migrate remaining workloads to **EKS + Kong**.
+At Cabify, we need to gather some specific documentation from our Drivers in order
+to comply with the law (IDs, car's licence plates, etc). These documents are managed
+on a later stage by our Customer Service agents.
 
-### **🔹 Phase 8: Advanced Monitoring & Security**
-✅ Fine-tune **ELK/OpenSearch + Instana + Prometheus + Grafana**.  
-✅ Improve security policies via Kyverno & AWS Shield.
+In order to handle and store these documents, we have a `Document processor` application that
+is used by both Drivers (via mobile phone) and Customer Service agents (via web browser).
 
-### **🔹 Phase 9: Dynamic EKS Cluster Management**
-✅ Develop **mechanism to shut down and start EKS clusters dynamically** to optimize costs.
+The `Document processor` application consists of three different parts:
 
----
+- A backend service implementing an API
+- A specific UI within the Cabify mobile applications that talk to the backend's API
+- An internal UI for our Customer Service team that talk to the backend's API
 
-## **🗺️ Updated EKS & Monitoring Architecture**
+Our Drivers numbers are increasing quickly as the company lands on many different
+countries, and we are starting to have some problems with the current setup, so we
+need to anticipate them and make sure we help the development team owning this application
+in the best possible way.
+
+As a SRE, your main goal will be revamping the whole system and designing a new one that
+is more up-to-date, resilient, scalable and easy to operate, so we will be able to minimise
+all possible risk and focus on some other important business needs.
+
+### Current architecture diagram
+
 ```mermaid
 graph LR
-  subgraph "AWS Cloud"
-    R53["Amazon Route 53"]
-    WAF["AWS WAF"]
-    Shield["AWS Shield"]
+  subgraph "Mobile App"
+  Drivers["Driver"]
   end
-
-  subgraph "Load Balancer (HA)"
-    LB1["Primary Load Balancer"]
-    LB2["Secondary Load Balancer (Failover)"]
+  subgraph "Desktop App"
+  Agents["Customer Service agents"]
   end
-
-  subgraph "Document Processor (VMs & EKS)"
-    VM1["Document Processor VM (Active)"]
-    VM2["Document Processor VM (Passive)"]
-    EKS1["EKS Workloads (Even Part)"]
-    EKS2["EKS Workloads (Add Part)"]
+  subgraph "Standalone Virtual Machine"
+  LB["Load Balancer"]
   end
-
-  subgraph "Storage Lifecycle"
-    S3_Std["S3 Standard (Active Docs)"]
-    S3_IA["S3 Infrequent Access (Older Docs)"]
-    Glacier["S3 Glacier (Archived Docs)"]
+  subgraph "Standalone Virtual Machine"
+  App["Document processor"]
+  Volume["Data volume"]
   end
-
-  subgraph "Backup & DR"
-    BackupS3["S3 Backup Bucket"]
-    DRRegion["Cross-Region Replication"]
+  subgraph "Standalone Virtual Machine"
+  FS["NFS volume"]
   end
-
-  subgraph "Kubernetes Tooling"
-    Karpenter["Karpenter (Autoscaling)"]
-    ArgoCD["ArgoCD (CI/CD)"]
-    Kyverno["Kyverno (Policy)"]
-    Secrets["Secret Manager"]
-    Certs["Cert Manager"]
-  end
-
-  subgraph "Monitoring & Logging"
-    Instana["Instana (Performance Monitoring)"]
-    ELK["ELK / OpenSearch Stack"]
-    Prometheus["Prometheus + Grafana"]
-  end
-
-  R53 -->|Routes Traffic| WAF
-  WAF -->|DDoS & Security Filtering| Shield
-  Shield -->|Weighted Routing| LB1
-  Shield -->|Failover Routing| LB2
-  LB1 --> VM1
-  LB2 --> VM2
-  VM1 --> EKS1
-  VM2 --> EKS2
-  EKS1 --> Karpenter
-  EKS1 --> ArgoCD
-  EKS1 --> Kyverno
-  EKS1 --> Secrets
-  EKS1 --> Certs
-  EKS1 --> Instana
-  EKS1 --> ELK
-  EKS1 --> Prometheus
-  EKS2 --> Karpenter
-  EKS2 --> ArgoCD
-  EKS2 --> Kyverno
-  EKS2 --> Secrets
-  EKS2 --> Certs
-  EKS2 --> Instana
-  EKS2 --> ELK
-  EKS2 --> Prometheus
-  VM1 -- "Stores Files" --> S3_Std
-  VM2 -- "Stores Files" --> S3_Std
-  S3_Std -- "Lifecycle Rule" --> S3_IA
-  S3_IA -- "Archival after X Days" --> Glacier
-  S3_Std -- "Daily Backups" --> BackupS3
-  BackupS3 -- "Disaster Recovery" --> DRRegion
+  Drivers-- "browse and upload documents API" -->LB
+  Agents-- "browse and administer documents API" -->LB
+  LB --> App
+  Volume-- "remotely mounted from" -->FS
 ```
 
----
+Some additional points about the diagram and its tiers (to simplify):
 
-## **🔹 Key Benefits**
-✅ **Zero Downtime** via HA Load Balancers & Blue-Green Strategy.  
-✅ **Scalable Storage** using S3 with lifecycle policies.  
-✅ **Full Observability** with **Instana, ELK/OpenSearch, Prometheus & Grafana**.  
-✅ **Seamless Migration** from VMs → EKS with phased rollout.  
-✅ **Cost Optimization** via auto-scaling (Karpenter) & EKS shutdown mechanism.  
-✅ **Enhanced Security** via AWS WAF, Shield, Kyverno & Secret Manager.
+- User Tier
+    - We have hundreds of thousands of `Drivers`.
+    - `Drivers` can see and upload their own documents.
+    - We have thousands of `Customer Service agents`.
+    - `Agents` can administer all `Drivers` documents: read, delete and upload new documents.
+- Load Balancer Tier
+    - `Load Balancer` has a public `IP` on The Internet, networking details are ommited.
+    - `Load Balancer` has a single `backend` service: the `Document processor` application.
+- Application Tier
+    - The `Document processor` application converts the raw images received into two different
+      kinds: low resolution and high resolution images (for mobile and desktop applications, respectively).
+    - All images are stored within a local data directory, which is remotely mounted on the host
+      via `NFS`.
+    - The `upload` process is a synchronous operation, so request times may take longer to
+      complete on slower networks.
+    - The images are read from disk by the `Document processor` when any of them is retrieved by
+      any of the applications.
+- Storage Tier
+    - The File Server VM host sole purpose is storing Driver's documents.
+    - Data redundancy is achieved via configured `RAID 1` with two mirrored SATA hard drives.
 
----
+### Tasks
+
+- Provide a `solution.md` file in this very same repository and work on the steps defined below:
+    1. Identify the bottlenecks and potential risks of the current approach and explain why.
+    2. Work on improving the current architecture:
+        - Design and provide a new architecture diagram (hint: you can use [GitLab's diagrams feature](https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts-using-mermaid)
+          to avoid using some other 3rd party tools).
+        - Explain the benefits of the new approach and how it solves the prior bottlenecks identified.
+    3. Elaborate what would be your action plan to execute this new project, considering:
+        - You would need to engage with different teams, and each of these teams' cooperation
+          may vary according to human factors and their own roadmap goals.
+        - You would need to rollout these changes without affecting the ongoing operations of
+          both Drivers and Agents.
+
+### Additional considerations
+- Please elaborate your answers as much as you can, try to focus on the high-level aspect
+  of the platform you are designing.
+- You can suggest specific technologies to be used as a replacement for the components above.
+  If that is the case, please specify why. Enumerating specific technologies to use is not mandatory,
+  you can still suggest any other abstract approach. We are more interested in getting to know
+  your train of thought :-).
+- Feel free to add additional tiers to the design as you need them.
