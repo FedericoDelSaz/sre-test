@@ -8,3 +8,5 @@
 | **Security & Compliance**    | - Documents stored on a single VM (risk of breaches) <br> - No API Gateway (no rate limiting or DDoS protection) <br> - No Web Application Firewall (WAF) | ✅ Use **Kong API Gateway** with **rate limiting** and **OAuth plugin** <br> ✅ Deploy **Istio Service Mesh** for traffic management & security |
 | **Deployment & Release Risks** | - No Canary/Blue-Green Deployments <br> - No progressive rollouts <br> - Slow manual rollback process | ✅ Adopt Canary & Blue-Green Deployments <br> ✅ Automate rollbacks with CI/CD pipelines |
 | **Mobile Notifications**     | - No notification system for mobile apps | ✅ Integrate **Firebase Cloud Messaging (FCM)** to send real-time notifications to the mobile app |
+
+**[Index](./Solution.md)**

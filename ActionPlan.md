@@ -55,3 +55,5 @@
 ✅ **Cost Optimization** via auto-scaling (Karpenter) & dynamic EKS management.  
 ✅ **Enhanced Security** via **Istio Service Mesh, Kong OAuth & Rate Limiting, Kyverno & Secret Manager**.  
 ✅ **Real-time Mobile Notifications** using **Firebase & a Notification Service in EKS**.
+
+**[Index](./Solution.md)**
