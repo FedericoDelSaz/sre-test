@@ -22,6 +22,7 @@
 - **ArgoCD** (GitOps-based CI/CD)
 - **Secret Manager** (secure credentials)
 - **Cert Manager** (TLS certificates)
+- **Kyverno** ClusterPolicies
 
 ✅ Gradually migrate workloads from VMs to EKS.
 - **Document Processor Service**
@@ -37,11 +38,7 @@
 ✅ Deploy **Notification Service in EKS** to send real-time alerts.  
 ✅ Integrate with **Firebase Cloud Messaging (FCM)** for push notifications to mobile apps.
 
-### **🔹 Phase 8: Security & EKS Good practices**
-✅ Implement ClusterPolicies via **Kyverno**.
-- **Kyverno** ClusterPolicies
-
-### **🔹 Phase 9: Dynamic EKS Cluster Management**
+### **🔹 Phase 8: Dynamic EKS Cluster Management**
 ✅ Develop **mechanism to optimize EKS cluster costs dynamically** by scaling resources efficiently (Karpenter Spot Instances).
 
 ---

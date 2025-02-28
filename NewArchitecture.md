@@ -2,7 +2,7 @@
 
 | **Challenge**                  | **Proposed Solution**                                                                                                                                                                                                                                            |
 |--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Scalability & Performance**  | ✅ Migrate to **AWS EKS** for Kubernetes-based auto-scaling (**Karpenter**) <br> ✅ Use **RabbitMQ** for asynchronous processing |
+| **Scalability & Performance**  | ✅ Migrate to **AWS EKS** for Kubernetes-based auto-scaling (**Karpenter**) <br> ✅ Use **Amazon MQ** for asynchronous processing |
 | **Traffic Control & Routing**  | ✅ Use **Amazon Route 53** for **failover & latency-based routing** |
 | **Storage & Data Security**    | ✅ Store documents in **Amazon EFS** (scalable, low latency) <br> ✅ **Encrypt documents** for security and compliance |
 | **Security & Compliance**      | ✅ Implement **Kong API Gateway** for authentication & rate limiting |
