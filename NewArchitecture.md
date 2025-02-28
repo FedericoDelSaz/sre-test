@@ -15,7 +15,7 @@
 
 ### **📞 Architecture Diagram**
 
-#### **Approach 1 (Single EKS Cluster with Istio Service Mesh)**
+#### **(Single EKS Cluster with Istio Service Mesh)**
 
 ```mermaid
 graph LR
@@ -58,7 +58,7 @@ graph LR
 
 ```
 
-#### **Approach 2 (Dual EKS Clusters per Sprint with Istio Service Mesh)**
+#### **(Dual EKS Clusters per Sprint with Istio Service Mesh)**
 
 ```mermaid
 graph LR
@@ -105,7 +105,86 @@ graph LR
   EFS-- "Backups to" --> AWSBackup
 
 ```
+Here's an enhanced **Dual EKS Cluster (Even/Odd) Approach** architecture diagram including **traffic weight shifting and deployment strategy**:
 
+---
+
+### **🚀 Dual EKS Cluster (Even/Odd) Approach with Traffic Weight Shifting & Deployment Strategy**
+
+```mermaid
+graph TD;
+  
+  subgraph AWS_Cloud
+    subgraph Networking
+      A[Amazon Route 53] -->|Failover & Latency Routing| B[ALB/NLB]
+    end
+    
+    subgraph Security
+      C[Kong API Gateway] -->|Auth, Rate Limiting| D[AWS WAF]
+      D -->|DDoS Protection| E[AWS Shield]
+    end
+
+    subgraph Compute
+      subgraph Europe_Region
+        F1[AWS EKS - Even Sprint Cluster] -->|Containerized Backend| G1[Dockerized Microservices (Even)]
+        F2[AWS EKS - Odd Sprint Cluster] -->|Containerized Backend| G2[Dockerized Microservices (Odd)]
+        
+        G1 -->|Async Processing| H1[RabbitMQ (Even)]
+        G2 -->|Async Processing| H2[RabbitMQ (Odd)]
+        
+        F1 & F2 -->|Dynamic Node Scaling| K[Karpenter Auto-Scaling]
+        
+        subgraph "Traffic Weight Shifting"
+          P1["Current Traffic: 90% → Odd Cluster"] 
+          P2["Canary Deployment: 10% → Even Cluster"]
+          P3["Full Rollout: 100% → Even Cluster"]
+          
+          P1 -->|Gradual Increase| P2
+          P2 -->|Success?| P3
+        end
+      end
+    end
+
+    subgraph Storage
+      I[AWS EFS] -->|Encrypted Storage| J[Data Lake / Documents]
+      J -->|Automated Backups| K[AWS Backup Service]
+    end
+
+    subgraph Deployment
+      L[CI/CD Pipeline] -->|Triggers Deployment| M[ArgoCD]
+      M -->|Deploys to Even Sprint Cluster| F1
+      M -->|Deploys to Odd Sprint Cluster| F2
+      
+      subgraph "Even/Odd Deployment Strategy"
+        N1["Current Sprint → Odd Cluster"]
+        N2["Upcoming Sprint → Deploy to Even Cluster"]
+        N3["Traffic Shifting → Gradual 10%-50%-100%"]
+        N4["Odd Cluster Becomes Idle"]
+        
+        N1 --> N2
+        N2 --> N3
+        N3 -->|Success?| N4
+      end
+    end
+  end
+  
+  A -->|Traffic Control| C
+  B -->|Routes Traffic| F1 & F2
+  C --> B
+  F1 & F2 --> I
+
+```
+
+---
+
+### **📌 Key Enhancements**
+✅ **Traffic Weight Shifting**: Gradually shifting traffic (10% → 50% → 100%) to the **new cluster** before decommissioning the old one.  
+✅ **Even/Odd Sprint Strategy**: Every sprint deploys to a **new EKS cluster**, keeping the previous cluster in **standby** until the transition is complete.  
+✅ **Karpenter Auto-Scaling**: Ensures each cluster **scales dynamically** based on workload demands.  
+✅ **AWS Backup Service**: Automates backups for **EFS data** instead of S3 for compliance and security.  
+✅ **ArgoCD for Canary Deployments**: Ensures **zero-downtime releases** while validating new changes before full rollout.
+
+Would you like any additional refinements? 🚀
 ---
 
 ### **📊 Feature Comparison**
