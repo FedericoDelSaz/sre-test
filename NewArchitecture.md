@@ -16,7 +16,7 @@
 
 ### **📞 Architecture Diagram**
 
-#### **Approach 1 (Single EKS Cluster with Istio Service Mesh)**
+#### ** Single EKS Cluster with Istio Service Mesh **
 
 ```mermaid
 graph LR
@@ -39,6 +39,7 @@ graph LR
       EKS["AWS EKS (Kubernetes Cluster)"]
       DocService["Document Processor Service"]
       NotificationService["Notification Service"]
+      AmazonMQ["Amazon MQ (RabbitMQ)"]
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
@@ -56,12 +57,13 @@ graph LR
   EKS --> DocService
   DocService-- "Process, Encrypt, Store" --> EFS
   DocService-- "Store Encrypted Download URL" --> MongoDB
+  DocService-- "Queue Processing" --> AmazonMQ
   EFS-- "Backups to" --> AWSBackup
   EKS --> NotificationService
   NotificationService-- "Send Push Notifications" --> Drivers
 ```
 
-#### **Approach 2 (Dual EKS Clusters per Sprint with Istio Service Mesh)**
+#### ** Dual EKS Clusters per Sprint with Istio Service Mesh **
 
 ```mermaid
 graph LR
@@ -89,6 +91,8 @@ graph LR
       DocService2["Document Processor Service (Odd Sprint)"]
       NotificationService1["Notification Service (Even Sprint)"]
       NotificationService2["Notification Service (Odd Sprint)"]
+      AmazonMQ1["Amazon MQ (RabbitMQ) - Even Sprint"]
+      AmazonMQ2["Amazon MQ (RabbitMQ) - Odd Sprint"]
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
@@ -109,6 +113,8 @@ graph LR
   EKS2 --> NotificationService2
   DocService1 & DocService2-- "Process, Encrypt, Store" --> EFS
   DocService1 & DocService2-- "Store Encrypted Download URL" --> MongoDB
+  DocService1 --> AmazonMQ1
+  DocService2 --> AmazonMQ2
   EFS-- "Backups to" --> AWSBackup
   NotificationService1-- "Send Push Notifications" --> Drivers
   NotificationService2-- "Send Push Notifications" --> Drivers
