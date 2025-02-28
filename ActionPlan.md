@@ -1,34 +1,32 @@
 ## **🚀 HA & Migration Plan**
 
 ### **🔹 Phase 1: High Availability (HA) Setup**
-✅ Route 53 for traffic management.  
-✅ **Istio Service Mesh** for traffic control & security.  
-✅ **Kong API Gateway** with **OAuth & rate-limiting** plugins.  
+✅ Route 53 for traffic management.
 ✅ Duplicate Document Processor VM & Load Balancer for HA.  
 ✅ Zero Downtime Rollouts using Blue-Green Deployment.
 
 ### **🔹 Phase 2: Storage Migration**
-✅ Migrate NFS to **EFS** with lifecycle rules and backups.  
-✅ **MongoDB** to store **encrypted document URLs** for secure downloads.
+✅ Migrate NFS to **EFS** with lifecycle rules and backups.
 
 ### **🔹 Phase 3: Containerization**
 ✅ Dockerize applications while keeping them in VMs.
 
 ### **🔹 Phase 4: Migration to EKS**
 ✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth**.
+✅ **Istio Service Mesh** for traffic control & security.  
 ✅ Deploy **Amazon MQ**.
 
 ### **🔹 Phase 5: Kubernetes Optimization**
 ✅ Implement:
 - **Karpenter** (autoscaling)
 - **ArgoCD** (GitOps-based CI/CD)
-- **Kyverno** (policy enforcement)
 - **Secret Manager** (secure credentials)
 - **Cert Manager** (TLS certificates)
 
 ✅ Gradually migrate workloads from VMs to EKS.
 - **Document Processor Service**
 - **Document Storage Service**
+- **MongoDB** to store **encrypted document URLs** for secure downloads.
 
 ### **🔹 Phase 6: Monitoring & Logging Implementation**
 ✅ Deploy **ELK (or OpenSearch) for log aggregation**.  
@@ -40,11 +38,11 @@
 ✅ Integrate with **Firebase Cloud Messaging (FCM)** for push notifications to mobile apps.
 
 ### **🔹 Phase 8: Advanced Monitoring & Security**
-✅ Fine-tune **ELK/OpenSearch + Instana + Prometheus + Grafana**.  
 ✅ Improve security policies via **Kyverno** & **Istio Security Policies**.
+- **Kyverno** (policy enforcement)
 
 ### **🔹 Phase 9: Dynamic EKS Cluster Management**
-✅ Develop **mechanism to optimize EKS cluster costs dynamically** by scaling resources efficiently.
+✅ Develop **mechanism to optimize EKS cluster costs dynamically** by scaling resources efficiently (Karpenter Spot Instances).
 
 ---
 
