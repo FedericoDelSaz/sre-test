@@ -101,7 +101,12 @@ graph LR
 ```mermaid
 graph LR
   subgraph "Mobile App & Desktop App"
-    Users["Users (Mobile & Desktop)"]
+    subgraph "Production App"
+      ProdUsers["Users (Production - Mobile & Desktop)"]
+    end
+    subgraph "Beta Tester App"
+      BetaUsers["Users (Beta Testing - Mobile & Desktop)"]
+    end
   end
   subgraph "AWS Cloud"
     subgraph "Networking & Security"
@@ -117,7 +122,7 @@ graph LR
         NotificationService_Active["Notification Service (Active)"]
         AmazonMQ_Active["Amazon MQ (Active)"]
       end
-      subgraph "Passive Cluster (For Testing & DR)"
+      subgraph "Passive Cluster (For Beta Testing & DR)"
         EKS_Passive["AWS EKS - Passive (Even/Odd)"]
         DocService_Passive["Document Processor (Passive)"]
         StorageService_Passive["Document Storage (Passive)"]
@@ -132,7 +137,9 @@ graph LR
     end
   end
 
-  Users-- "Browse & Upload Documents" --> Route53
+  ProdUsers-- "Browse & Upload Documents" --> Route53
+  BetaUsers-- "Browse & Upload Documents (Beta)" --> Route53
+
   Route53 --> ALB
   ALB --> Kong
   Kong --> EKS_Active & EKS_Passive
@@ -156,19 +163,9 @@ graph LR
   StorageService_Active -->|"Trigger Notification"| NotificationService_Active
   StorageService_Passive -->|"Trigger Notification"| NotificationService_Passive
 
-  NotificationService_Active -->|"Send Push Notification"| Users
-  NotificationService_Passive -->|"Send Push Notification"| Users
+  NotificationService_Active -->|"Send Push Notification"| ProdUsers
+  NotificationService_Passive -->|"Send Push Notification"| BetaUsers
 
-  %% Disaster Recovery & Testing Benefits
-  subgraph "Benefits of Dual Cluster Deployment"
-    HA["✔ Multi-Cluster Redundancy (Ensures high availability)"]
-    DR["✔ Disaster Recovery (Traffic shifts if one fails)"]
-    Test["✔ Internal Testing (Passive EKS used for staging)"]
-  end
-
-  EKS_Active --> HA
-  EKS_Active --> DR
-  EKS_Passive --> Test
 ```
 
 ### **Key Takeaways**
@@ -176,26 +173,5 @@ graph LR
 - **Passive EKS Cluster** allows **staging & disaster recovery**
 - **Failover mechanism**: If Active EKS fails, Route 53 shifts traffic
 - **Testing & Validation**: Internal app users can test on Passive Cluster
-
----
-
-### **📊 Feature Comparison**
-
-| **Feature**                     | **Approach 1 (Single EKS Cluster with Istio)** | **Approach 2 (Dual EKS Clusters with Istio per Sprint)** |
-|----------------------------------|--------------------------------------------|---------------------------------------------|
-| **Traffic Control**              | ✅ Amazon Route 53 (low cost)              | ✅ Amazon Route 53 (low cost)               |
-| **Load Balancing**               | ✅ AWS ALB/NLB (scalable, pay-as-you-go) | ✅ AWS ALB/NLB (scalable, pay-as-you-go)   |
-| **Security**                     | ✅ Kong API Gateway (moderate cost) | ✅ Kong API Gateway (higher due to 2 clusters) |
-| **Compute (Execution Environment)** | ✅ Single AWS EKS Cluster (scalable, efficient cost) | ✅ Two AWS EKS Clusters (double EKS cost) |
-| **Deployment Strategy**          | ✅ ArgoCD + Argo Rollouts (low additional cost) | ✅ ArgoCD (low cost, no Argo Rollouts) |
-| **Scalability (Karpenter)** | ✅ Kubernetes-based auto-scaling (efficient cost) | ✅ Kubernetes-based auto-scaling (higher cost due to 2 clusters) |
-| **Sprint-Based Deployment**      | ❌ Single cluster handles all sprints     | ✅ One EKS for even sprints, one for odd (higher infra cost) |
-| **Async Processing**             | ✅ RabbitMQ (low cost per message processed) | ✅ Separate RabbitMQ per cluster (higher due to duplication) |
-| **Backup Strategy**              | ✅ **AWS Backup Service for EFS** (more secure) | ✅ **AWS Backup Service for EFS** (more secure) |
-| **High Availability (HA)**       | ✅ Kubernetes redundancy & failover       | ✅ Multi-cluster redundancy (even/odd) (higher cost) |
-| **Resilience & Fault Tolerance** | ✅ Kubernetes cluster self-healing        | ✅ Two independent clusters for resilience |
-| **Service Mesh (Istio)**         | ✅ Centralized traffic control, observability, security | ✅ Separate Istio instances for each cluster (higher cost) |
-| **Mobile Notifications**         | ✅ Notification Service with **Firebase** | ✅ Notification Service with **Firebase** (higher cost due to duplication) |
-| **Cost Consideration 💰**        | 💲 **Optimized (Single EKS, scalable, moderate cost)** | 💲💲 **Higher (2x EKS clusters, better isolation)** |
 
 ---
