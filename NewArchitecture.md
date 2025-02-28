@@ -117,30 +117,20 @@ graph LR
       Kong_Odd["Kong API Gateway (Odd EKS)"]
       Kong_Even["Kong API Gateway (Even EKS)"]
     end
-    subgraph "Dual EKS Deployment (Redundant & Isolated Clusters)"
-      subgraph "Active Cluster (Handles Live Traffic)"
-        EKS_Odd_Active["AWS EKS - Active (Odd Sprint)"]
-        EKS_Even_Active["AWS EKS - Active (Even Sprint)"]
-        DocService_Odd_Active["Document Processor (Odd Active)"]
-        DocService_Even_Active["Document Processor (Even Active)"]
-        StorageService_Odd_Active["Document Storage (Odd Active)"]
-        StorageService_Even_Active["Document Storage (Even Active)"]
-        NotificationService_Odd_Active["Notification Service (Odd Active)"]
-        NotificationService_Even_Active["Notification Service (Even Active)"]
-        AmazonMQ_Odd_Active["Amazon MQ (Odd Active)"]
-        AmazonMQ_Even_Active["Amazon MQ (Even Active)"]
+    subgraph "EKS Deployment (Handles Live Traffic)"
+      subgraph "Odd Sprint Cluster"
+        EKS_Odd["AWS EKS - Odd Sprint"]
+        DocService_Odd["Document Processor (Odd)"]
+        StorageService_Odd["Document Storage (Odd)"]
+        NotificationService_Odd["Notification Service (Odd)"]
+        AmazonMQ_Odd["Amazon MQ (Odd)"]
       end
-      subgraph "Passive Cluster (For Beta Testing & DR)"
-        EKS_Odd_Passive["AWS EKS - Passive (Odd Sprint)"]
-        EKS_Even_Passive["AWS EKS - Passive (Even Sprint)"]
-        DocService_Odd_Passive["Document Processor (Odd Passive)"]
-        DocService_Even_Passive["Document Processor (Even Passive)"]
-        StorageService_Odd_Passive["Document Storage (Odd Passive)"]
-        StorageService_Even_Passive["Document Storage (Even Passive)"]
-        NotificationService_Odd_Passive["Notification Service (Odd Passive)"]
-        NotificationService_Even_Passive["Notification Service (Even Passive)"]
-        AmazonMQ_Odd_Passive["Amazon MQ (Odd Passive)"]
-        AmazonMQ_Even_Passive["Amazon MQ (Even Passive)"]
+      subgraph "Even Sprint Cluster"
+        EKS_Even["AWS EKS - Even Sprint"]
+        DocService_Even["Document Processor (Even)"]
+        StorageService_Even["Document Storage (Even)"]
+        NotificationService_Even["Notification Service (Even)"]
+        AmazonMQ_Even["Amazon MQ (Even)"]
       end
     end
     subgraph "Storage & Backup"
@@ -158,45 +148,9 @@ graph LR
   ALB -->|Odd Requests| Kong_Odd
   ALB -->|Even Requests| Kong_Even
 
-  Kong_Odd --> EKS_Odd_Active & EKS_Odd_Passive
-  Kong_Even --> EKS_Even_Active & EKS_Even_Passive
+  Kong_Odd --> EKS_Odd
+  Kong_Even --> EKS_Even
 
-  EKS_Odd_Active --> DocService_Odd_Active
-  EKS_Even_Active --> DocService_Even_Active
-  EKS_Odd_Passive --> DocService_Odd_Passive
-  EKS_Even_Passive --> DocService_Even_Passive
-
-  DocService_Odd_Active -->|"Send to Queue"| AmazonMQ_Odd_Active
-  DocService_Even_Active -->|"Send to Queue"| AmazonMQ_Even_Active
-  DocService_Odd_Passive -->|"Send to Queue"| AmazonMQ_Odd_Passive
-  DocService_Even_Passive -->|"Send to Queue"| AmazonMQ_Even_Passive
-
-  AmazonMQ_Odd_Active -->|"Process Storage"| StorageService_Odd_Active
-  AmazonMQ_Even_Active -->|"Process Storage"| StorageService_Even_Active
-  AmazonMQ_Odd_Passive -->|"Process Storage"| StorageService_Odd_Passive
-  AmazonMQ_Even_Passive -->|"Process Storage"| StorageService_Even_Passive
-
-  StorageService_Odd_Active -->|"Save File"| EFS
-  StorageService_Even_Active -->|"Save File"| EFS
-  StorageService_Odd_Passive -->|"Save File"| EFS
-  StorageService_Even_Passive -->|"Save File"| EFS
-
-  StorageService_Odd_Active -->|"Store URL"| MongoDB
-  StorageService_Even_Active -->|"Store URL"| MongoDB
-  StorageService_Odd_Passive -->|"Store URL"| MongoDB
-  StorageService_Even_Passive -->|"Store URL"| MongoDB
-
-  EFS-- "Backup to" --> AWSBackup
-
-  StorageService_Odd_Active -->|"Trigger Notification"| NotificationService_Odd_Active
-  StorageService_Even_Active -->|"Trigger Notification"| NotificationService_Even_Active
-  StorageService_Odd_Passive -->|"Trigger Notification"| NotificationService_Odd_Passive
-  StorageService_Even_Passive -->|"Trigger Notification"| NotificationService_Even_Passive
-
-  NotificationService_Odd_Active -->|"Send Push Notification"| ProdUsers
-  NotificationService_Even_Active -->|"Send Push Notification"| ProdUsers
-  NotificationService_Odd_Passive -->|"Send Push Notification"| BetaUsers
-  NotificationService_Even_Passive -->|"Send Push Notification"| BetaUsers
 
 
 ```
