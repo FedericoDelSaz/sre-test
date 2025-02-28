@@ -6,7 +6,6 @@
 ✅ **Kong API Gateway** with **OAuth & rate-limiting** plugins.  
 ✅ Duplicate Document Processor VM & Load Balancer for HA.  
 ✅ Zero Downtime Rollouts using Blue-Green Deployment.
-✅ Deploy a **single EKS cluster** to consolidate workloads.
 
 ### **🔹 Phase 2: Storage Migration**
 ✅ Migrate NFS to **EFS** with lifecycle rules and backups.  
@@ -35,7 +34,6 @@
 ✅ Deploy **ELK (or OpenSearch) for log aggregation**.  
 ✅ Set up **Instana** for performance monitoring.  
 ✅ Enable **Kubernetes native monitoring** (Prometheus + Grafana).
-
 
 ### **🔹 Phase 7: Firebase & Notification Service**
 ✅ Deploy **Notification Service in EKS** to send real-time alerts.  
