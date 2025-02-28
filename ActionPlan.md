@@ -37,9 +37,9 @@
 ✅ Deploy **Notification Service in EKS** to send real-time alerts.  
 ✅ Integrate with **Firebase Cloud Messaging (FCM)** for push notifications to mobile apps.
 
-### **🔹 Phase 8: Advanced Monitoring & Security**
-✅ Improve security policies via **Kyverno** & **Istio Security Policies**.
-- **Kyverno** (policy enforcement)
+### **🔹 Phase 8: Security & EKS Good practices**
+✅ Implement ClusterPolicies via **Kyverno**.
+- **Kyverno** ClusterPolicies
 
 ### **🔹 Phase 9: Dynamic EKS Cluster Management**
 ✅ Develop **mechanism to optimize EKS cluster costs dynamically** by scaling resources efficiently (Karpenter Spot Instances).
