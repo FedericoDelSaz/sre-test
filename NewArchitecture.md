@@ -94,63 +94,88 @@ graph LR
 
 #### ** Dual EKS Clusters per Sprint with Istio Service Mesh **
 
+✅ **Multi-cluster redundancy (Even/Odd Sprints)** for resilience  
+✅ **Disaster recovery preparedness** (If one EKS fails, traffic shifts)  
+✅ **Internal testing of new releases** by routing the Mobile & Desktop App to the passive EKS cluster
+
 ```mermaid
 graph LR
-  subgraph "Mobile App"
-    Drivers["Driver"]
-  end
-  subgraph "Desktop App"
-    Agents["Customer Service Agents"]
+  subgraph "Mobile App & Desktop App"
+    Users["Users (Mobile & Desktop)"]
   end
   subgraph "AWS Cloud"
-    subgraph "Networking"
+    subgraph "Networking & Security"
       Route53["Amazon Route 53 (Failover & Latency Routing)"]
-      ALB["ALB/NLB"]
+      ALB["AWS ALB/NLB"]
+      Kong["Kong API Gateway (Auth, Rate Limiting)"]
     end
-    subgraph "Security"
-      Kong["Kong API Gateway"]
-      Istio["Istio Service Mesh"]
-    end
-    subgraph "Compute"
-      subgraph "Europe Region"
-        EKS1["AWS EKS - Even Sprint Cluster"]
-        EKS2["AWS EKS - Odd Sprint Cluster"]
+    subgraph "Dual EKS Deployment (Redundant & Isolated Clusters)"
+      subgraph "Active Cluster (Handles Live Traffic)"
+        EKS_Active["AWS EKS - Active (Even/Odd)"]
+        DocService_Active["Document Processor (Active)"]
+        StorageService_Active["Document Storage (Active)"]
+        NotificationService_Active["Notification Service (Active)"]
+        AmazonMQ_Active["Amazon MQ (Active)"]
       end
-      DocService1["Document Processor Service (Even Sprint)"]
-      DocService2["Document Processor Service (Odd Sprint)"]
-      StorageService1["Document Storage Service (Even Sprint)"]
-      StorageService2["Document Storage Service (Odd Sprint)"]
-      NotificationService1["Notification Service (Even Sprint)"]
-      NotificationService2["Notification Service (Odd Sprint)"]
-      AmazonMQ1["Amazon MQ (RabbitMQ) - Even Sprint"]
-      AmazonMQ2["Amazon MQ (RabbitMQ) - Odd Sprint"]
+      subgraph "Passive Cluster (For Testing & DR)"
+        EKS_Passive["AWS EKS - Passive (Even/Odd)"]
+        DocService_Passive["Document Processor (Passive)"]
+        StorageService_Passive["Document Storage (Passive)"]
+        NotificationService_Passive["Notification Service (Passive)"]
+        AmazonMQ_Passive["Amazon MQ (Passive)"]
+      end
     end
-    subgraph "Storage"
+    subgraph "Storage & Backup"
       EFS["Amazon EFS (Encrypted)"]
       MongoDB["MongoDB (Download URLs)"]
-      AWSBackup["AWS Backup Service (EFS)"]
+      AWSBackup["AWS Backup Service"]
     end
   end
 
-  Drivers-- "Browse and Upload Documents API" -->Route53
-  Agents-- "Browse and Administer Documents API" -->Route53
+  Users-- "Browse & Upload Documents" --> Route53
   Route53 --> ALB
   ALB --> Kong
-  Kong --> Istio
-  Istio --> EKS1 & EKS2
-  EKS1 --> DocService1
-  EKS2 --> DocService2
-  DocService1 -->|"Send to Queue"| AmazonMQ1
-  DocService2 -->|"Send to Queue"| AmazonMQ2
-  AmazonMQ1 -->|"Listen & Process"| StorageService1
-  AmazonMQ2 -->|"Listen & Process"| StorageService2
-  StorageService1 & StorageService2 -->|"Store Document"| EFS
-  StorageService1 & StorageService2 -->|"Save Download URL"| MongoDB
-  EFS-- "Backups to" --> AWSBackup
-  StorageService1 & StorageService2 -->|"Trigger Notification"| NotificationService1 & NotificationService2
-  NotificationService1 & NotificationService2 -->|"Send Push Notification (Download URL)"| Drivers
+  Kong --> EKS_Active & EKS_Passive
 
+  EKS_Active --> DocService_Active
+  EKS_Passive --> DocService_Passive
+  DocService_Active -->|"Send to Queue"| AmazonMQ_Active
+  DocService_Passive -->|"Send to Queue"| AmazonMQ_Passive
+
+  AmazonMQ_Active -->|"Process Storage"| StorageService_Active
+  AmazonMQ_Passive -->|"Process Storage"| StorageService_Passive
+
+  StorageService_Active -->|"Save File"| EFS
+  StorageService_Passive -->|"Save File"| EFS
+
+  StorageService_Active -->|"Store URL"| MongoDB
+  StorageService_Passive -->|"Store URL"| MongoDB
+
+  EFS-- "Backup to" --> AWSBackup
+
+  StorageService_Active -->|"Trigger Notification"| NotificationService_Active
+  StorageService_Passive -->|"Trigger Notification"| NotificationService_Passive
+
+  NotificationService_Active -->|"Send Push Notification"| Users
+  NotificationService_Passive -->|"Send Push Notification"| Users
+
+  %% Disaster Recovery & Testing Benefits
+  subgraph "Benefits of Dual Cluster Deployment"
+    HA["✔ Multi-Cluster Redundancy (Ensures high availability)"]
+    DR["✔ Disaster Recovery (Traffic shifts if one fails)"]
+    Test["✔ Internal Testing (Passive EKS used for staging)"]
+  end
+
+  EKS_Active --> HA
+  EKS_Active --> DR
+  EKS_Passive --> Test
 ```
+
+### **Key Takeaways**
+- **Active EKS Cluster** handles live traffic
+- **Passive EKS Cluster** allows **staging & disaster recovery**
+- **Failover mechanism**: If Active EKS fails, Route 53 shifts traffic
+- **Testing & Validation**: Internal app users can test on Passive Cluster
 
 ---
 
