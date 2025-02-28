@@ -19,7 +19,7 @@
 ✅ Deploy **first EKS cluster + Kong API Gateway**.\
 ✅ Kong OAuth and Rate Limit plugins.
 
-### **🔹 Phase 5: Kubernetes Optimization (Add Part)**
+### **🔹 Phase 5: Kubernetes Optimization (Even Part Only)**
 
 ✅ Implement:
 
@@ -30,7 +30,7 @@
 - **Cert Manager** (TLS certificates)
 - **Istio** (Service Mesh)
 
-### **🔹 Phase 6: Deploy Applications in EKS (Add Part)**
+### **🔹 Phase 6: Deploy Applications in EKS (Even Part Only)**
 
 ✅ Migrate applications to Helm charts.
 
@@ -41,18 +41,18 @@
 - ✅ Desktop App
 - ✅ Document Service
 
-### **🔹 Phase 7: Monitoring & Logging Implementation (Add Part)**
+### **🔹 Phase 7: Monitoring & Logging Implementation (Even Part Only)**
 
 ✅ Deploy **ELK (or OpenSearch) for log aggregation**.\
 ✅ Set up **Instana** for performance monitoring.\
 ✅ Enable **Kubernetes native monitoring** (Prometheus + Grafana).
 
-### **🔹 Phase 8: Full EKS Migration (Add Part)**
+### **🔹 Phase 8: Full EKS Migration (Odd Part)**
 
 ✅ Migrate remaining workloads to **EKS + Kong**.\
 ✅ Kong OAuth and Rate Limit plugins.
 
-### **🔹 Phase 9: Kubernetes Optimization (Add Part)**
+### **🔹 Phase 9: Kubernetes Optimization (Odd Part)**
 
 ✅ Implement:
 
