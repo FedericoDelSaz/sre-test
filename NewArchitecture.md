@@ -89,10 +89,7 @@ graph LR
 
 ---
 
-
-
-
-#### ** Dual EKS Clusters per Sprint with Istio Service Mesh **
+#### **Dual EKS Clusters per Sprint with Istio Service Mesh**
 
 ✅ **Multi-cluster redundancy (Even/Odd Sprints)** for resilience  
 ✅ **Disaster recovery preparedness** (If one EKS fails, traffic shifts)  
