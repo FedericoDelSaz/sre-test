@@ -9,4 +9,4 @@
 | **Deployment & Release Risks** | - No Canary/Blue-Green Deployments <br> - No progressive rollouts <br> - Slow manual rollback process | ✅ Adopt Canary & Blue-Green Deployments <br> ✅ Automate rollbacks with CI/CD pipelines |
 | **Mobile Notifications**     | - No notification system for mobile apps | ✅ Integrate **Firebase Cloud Messaging (FCM)** to send real-time notifications to the mobile app |
 
-**[Index](./Solution.md)**
+**[Return to the index.](./Solution.md)**

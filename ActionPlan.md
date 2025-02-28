@@ -56,4 +56,4 @@
 ✅ **Enhanced Security** via **Istio Service Mesh, Kong OAuth & Rate Limiting, Kyverno & Secret Manager**.  
 ✅ **Real-time Mobile Notifications** using **Firebase & a Notification Service in EKS**.
 
-**[Index](./Solution.md)**
+**[Return to the index.](./Solution.md)**

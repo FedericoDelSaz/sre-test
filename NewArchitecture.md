@@ -161,4 +161,4 @@ graph LR
 
 ---
 
-**[Index](./Solution.md)**
+**[Return to the index.](./Solution.md)**
