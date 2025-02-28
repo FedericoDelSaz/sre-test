@@ -111,7 +111,8 @@ graph LR
   subgraph "AWS Cloud"
     subgraph "Networking & Security"
       Route53["Amazon Route 53 (Failover & Latency Routing)"]
-      ALB["AWS ALB/NLB"]
+      ALB_Odd["AWS ALB/NLB (Odd Traffic)"]
+      ALB_Even["AWS ALB/NLB (Even Traffic)"]
     end
     subgraph "API Gateway Layer"
       Kong_Odd["Kong API Gateway (Odd EKS)"]
@@ -144,14 +145,14 @@ graph LR
   ProdUsers-- "Browse & Upload Documents" --> Route53
   BetaUsers-- "Browse & Upload Documents (Beta)" --> Route53
 
-  Route53 --> ALB
-  ALB -->|Odd Requests| Kong_Odd
-  ALB -->|Even Requests| Kong_Even
+  Route53 -->|Odd Requests| ALB_Odd
+  Route53 -->|Even Requests| ALB_Even
+
+  ALB_Odd --> Kong_Odd
+  ALB_Even --> Kong_Even
 
   Kong_Odd --> EKS_Odd
   Kong_Even --> EKS_Even
-
-
 
 ```
 
