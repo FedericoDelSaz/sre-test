@@ -1,7 +1,7 @@
 ## **🚀 HA & Migration Plan**
 
 ### **🔹 Phase 1: High Availability (HA) Setup**
-✅ Route 53 for traffic management.
+✅ Route 53 for traffic management.  
 ✅ Duplicate Document Processor VM & Load Balancer for HA.  
 ✅ Zero Downtime Rollouts using Blue-Green Deployment.
 
@@ -12,8 +12,8 @@
 ✅ Dockerize applications while keeping them in VMs.
 
 ### **🔹 Phase 4: Migration to EKS**
-✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth**.
-✅ **Istio Service Mesh** for traffic control & security.
+✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth**.  
+✅ **Istio Service Mesh** for traffic control & security.  
 ✅ Deploy **Amazon MQ**.
 
 ### **🔹 Phase 5: Kubernetes Optimization**
@@ -55,4 +55,3 @@
 ✅ **Cost Optimization** via auto-scaling (Karpenter) & dynamic EKS management.  
 ✅ **Enhanced Security** via **Istio Service Mesh, Kong OAuth & Rate Limiting, Kyverno & Secret Manager**.  
 ✅ **Real-time Mobile Notifications** using **Firebase & a Notification Service in EKS**.
-
