@@ -13,7 +13,7 @@
 
 ### **🔹 Phase 4: Migration to EKS**
 ✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth**.
-✅ **Istio Service Mesh** for traffic control & security.  
+✅ **Istio Service Mesh** for traffic control & security.
 ✅ Deploy **Amazon MQ**.
 
 ### **🔹 Phase 5: Kubernetes Optimization**
