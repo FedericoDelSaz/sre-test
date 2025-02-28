@@ -4,13 +4,14 @@
 |--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Scalability & Performance**  | ✅ Migrate to **AWS EKS** for Kubernetes-based auto-scaling (**Karpenter**) <br> ✅ Use **Amazon MQ** for asynchronous processing |
 | **Traffic Control & Routing**  | ✅ Use **Amazon Route 53** for **failover & latency-based routing** |
-| **Storage & Data Security**    | ✅ Store documents in **Amazon EFS** (scalable, low latency) <br> ✅ **Encrypt documents** for security and compliance |
+| **Storage & Data Security**    | ✅ Store documents in **Amazon EFS** (scalable, low latency) <br> ✅ **Encrypt documents** for security and compliance <br> ✅ Store document URLs in **MongoDB Atlas** for easy access and retrieval of metadata |
 | **Security & Compliance**      | ✅ Implement **Kong API Gateway** for authentication & rate limiting |
 | **Reliability & Fault Tolerance** | ✅ Use **Route 53 failover** for high availability <br> ✅ Implement **AWS Backup Service** for EFS backups |
 | **Deployment & Release Risks** | ✅ Adopt **Canary & Blue-Green Deployments** for safer rollouts and minimal downtime |
 | **Containerization & Portability** | ✅ **Dockerize applications** for consistency across environments <br> ✅ Deploy containers using **Amazon EKS** for managed **Kubernetes orchestration** |
 | **Service Mesh & Observability** | ✅ Integrate **Istio Service Mesh** for traffic management, security, and observability |
 | **Mobile Notifications**       | ✅ Add **NotificationService** to send notifications to the mobile app via **Firebase Cloud Messaging (FCM)** |
+| **Document URL Management**    | ✅ Store document URLs in **MongoDB Atlas** for easy access and retrieval of metadata |
 
 ---
 
