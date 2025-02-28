@@ -6,6 +6,7 @@
 ✅ **Kong API Gateway** with **OAuth & rate-limiting** plugins.  
 ✅ Duplicate Document Processor VM & Load Balancer for HA.  
 ✅ Zero Downtime Rollouts using Blue-Green Deployment.
+✅ Deploy a **single EKS cluster** to consolidate workloads.
 
 ### **🔹 Phase 2: Storage Migration**
 ✅ Migrate NFS to **EFS** with lifecycle rules and backups.  
@@ -14,15 +15,11 @@
 ### **🔹 Phase 3: Containerization**
 ✅ Dockerize applications while keeping them in VMs.
 
-### **🔹 Phase 4: Migration to EKS (Even Part Only)**
-✅ Deploy **first EKS cluster + Kong API Gateway**.
+### **🔹 Phase 4: Migration to EKS**
+✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth**.
+✅ Deploy **Amazon MQ**.
 
-### **🔹 Phase 5: Monitoring & Logging Implementation**
-✅ Deploy **ELK (or OpenSearch) for log aggregation**.  
-✅ Set up **Instana** for performance monitoring.  
-✅ Enable **Kubernetes native monitoring** (Prometheus + Grafana).
-
-### **🔹 Phase 6: Kubernetes Optimization**
+### **🔹 Phase 5: Kubernetes Optimization**
 ✅ Implement:
 - **Karpenter** (autoscaling)
 - **ArgoCD** (GitOps-based CI/CD)
@@ -30,19 +27,26 @@
 - **Secret Manager** (secure credentials)
 - **Cert Manager** (TLS certificates)
 
-### **🔹 Phase 7: Full EKS Migration (Add Part)**
-✅ Migrate remaining workloads to **EKS + Kong**.
+✅ Gradually migrate workloads from VMs to EKS.
+- **Document Processor Service**
+- **Document Storage Service**
+
+### **🔹 Phase 6: Monitoring & Logging Implementation**
+✅ Deploy **ELK (or OpenSearch) for log aggregation**.  
+✅ Set up **Instana** for performance monitoring.  
+✅ Enable **Kubernetes native monitoring** (Prometheus + Grafana).
+
+
+### **🔹 Phase 7: Firebase & Notification Service**
+✅ Deploy **Notification Service in EKS** to send real-time alerts.  
+✅ Integrate with **Firebase Cloud Messaging (FCM)** for push notifications to mobile apps.
 
 ### **🔹 Phase 8: Advanced Monitoring & Security**
 ✅ Fine-tune **ELK/OpenSearch + Instana + Prometheus + Grafana**.  
 ✅ Improve security policies via **Kyverno** & **Istio Security Policies**.
 
 ### **🔹 Phase 9: Dynamic EKS Cluster Management**
-✅ Develop **mechanism to shut down and start EKS clusters dynamically** to optimize costs.
-
-### **🔹 Phase 10: Firebase & Notification Service**
-✅ Deploy **Notification Service in EKS** to send real-time alerts.  
-✅ Integrate with **Firebase Cloud Messaging (FCM)** for push notifications to mobile apps.
+✅ Develop **mechanism to optimize EKS cluster costs dynamically** by scaling resources efficiently.
 
 ---
 
@@ -52,8 +56,7 @@
 ✅ **Secure Document Management** via **MongoDB storing encrypted document URLs** for controlled access.  
 ✅ **Full Observability** with **Instana, ELK/OpenSearch, Prometheus & Grafana**.  
 ✅ **Seamless Migration** from VMs → EKS with phased rollout.  
-✅ **Cost Optimization** via auto-scaling (Karpenter) & EKS shutdown mechanism.  
+✅ **Cost Optimization** via auto-scaling (Karpenter) & dynamic EKS management.  
 ✅ **Enhanced Security** via **Istio Service Mesh, Kong OAuth & Rate Limiting, Kyverno & Secret Manager**.  
 ✅ **Real-time Mobile Notifications** using **Firebase & a Notification Service in EKS**.
 
----
