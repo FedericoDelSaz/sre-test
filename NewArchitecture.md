@@ -10,6 +10,7 @@
 | **Deployment & Release Risks** | ✅ Adopt **Canary & Blue-Green Deployments** for safer rollouts and minimal downtime |
 | **Containerization & Portability** | ✅ **Dockerize applications** for consistency across environments <br> ✅ Deploy containers using **Amazon EKS** for managed **Kubernetes orchestration** |
 | **Service Mesh & Observability** | ✅ Integrate **Istio Service Mesh** for traffic management, security, and observability |
+| **Mobile Notifications**       | ✅ Add **NotificationService** to send notifications to the mobile app via **Firebase Cloud Messaging (FCM)** |
 
 ---
 
@@ -37,6 +38,7 @@ graph LR
     subgraph "Compute"
       EKS["AWS EKS (Kubernetes Cluster)"]
       DocService["Document Processor Service"]
+      NotificationService["Notification Service"]
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
@@ -55,7 +57,8 @@ graph LR
   DocService-- "Process, Encrypt, Store" --> EFS
   DocService-- "Store Encrypted Download URL" --> MongoDB
   EFS-- "Backups to" --> AWSBackup
-
+  EKS --> NotificationService
+  NotificationService-- "Send Push Notifications" --> Drivers
 ```
 
 #### **Approach 2 (Dual EKS Clusters per Sprint with Istio Service Mesh)**
@@ -84,6 +87,8 @@ graph LR
       end
       DocService1["Document Processor Service (Even Sprint)"]
       DocService2["Document Processor Service (Odd Sprint)"]
+      NotificationService1["Notification Service (Even Sprint)"]
+      NotificationService2["Notification Service (Odd Sprint)"]
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
@@ -100,10 +105,13 @@ graph LR
   Istio --> EKS1 & EKS2
   EKS1 --> DocService1
   EKS2 --> DocService2
+  EKS1 --> NotificationService1
+  EKS2 --> NotificationService2
   DocService1 & DocService2-- "Process, Encrypt, Store" --> EFS
   DocService1 & DocService2-- "Store Encrypted Download URL" --> MongoDB
   EFS-- "Backups to" --> AWSBackup
-
+  NotificationService1-- "Send Push Notifications" --> Drivers
+  NotificationService2-- "Send Push Notifications" --> Drivers
 ```
 
 ---
@@ -124,6 +132,7 @@ graph LR
 | **High Availability (HA)**       | ✅ Kubernetes redundancy & failover       | ✅ Multi-cluster redundancy (even/odd) (higher cost) |
 | **Resilience & Fault Tolerance** | ✅ Kubernetes cluster self-healing        | ✅ Two independent clusters for resilience |
 | **Service Mesh (Istio)**         | ✅ Centralized traffic control, observability, security | ✅ Separate Istio instances for each cluster (higher cost) |
+| **Mobile Notifications**         | ✅ Notification Service with **Firebase** | ✅ Notification Service with **Firebase** (higher cost due to duplication) |
 | **Cost Consideration 💰**        | 💲 **Optimized (Single EKS, scalable, moderate cost)** | 💲💲 **Higher (2x EKS clusters, better isolation)** |
 
 ---
