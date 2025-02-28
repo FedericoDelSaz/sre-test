@@ -36,7 +36,8 @@ graph TD;
     end
 
     subgraph Compute
-      F[AWS EKS (Single Cluster)] -->|Containerized Backend| G[Dockerized Microservices]
+      F[AWS EKS (Single Cluster)]
+      F -->|Containerized Backend| G[Dockerized Microservices]
       G -->|Async Processing| H[RabbitMQ]
       F -->|Dynamic Node Scaling| Karpenter[Karpenter Auto-Scaling]
     end
@@ -57,6 +58,7 @@ graph TD;
   C --> B
   B --> F
   F --> I
+
 
 ```
 
