@@ -1,26 +1,16 @@
 ## **🚀 Proposed Architecture for the Document Processor System**
+
 ### **Key Components**
 - **AWS EKS (Kubernetes) for containerized microservices**
 - **Amazon Route 53 for traffic routing**
-- **Kong API Gateway for security & rate limiting**
+- **Kong API Gateway for security & OAuth & rate limiting**
 - **RabbitMQ for async processing**
-- **AWS S3 (encrypted) + AWS Glacier for storage & backups**
+- **AWS EFS (encrypted) + AWS Glacier for storage & backups**
 - **ArgoCD + Argo Rollouts for CI/CD deployments**
 - **Karpenter for dynamic node scaling & cost efficiency**
+- **Istio - Service Mesh**
+- **Kyverno - Cluster Policy**
 
----
-
-## **🔄 Approach Comparison: Single vs. Dual EKS Clusters**
-| **Feature**                     | **Approach 1: Single EKS Cluster**  | **Approach 2: Dual EKS Clusters (Even/Odd Sprints)** |
-|----------------------------------|-------------------------------------|-----------------------------------------------------|
-| **Traffic Control**              | ✅ Route 53 (Failover & Latency Routing) | ✅ Route 53 (Weighted Traffic Shifting) |
-| **Security**                     | ✅ Kong API Gateway | ✅ Kong API Gateway (2 clusters) |
-| **Scalability**                   | ✅ Kubernetes auto-scaling + Karpenter | ✅ Kubernetes auto-scaling + Karpenter |
-| **Deployment Strategy**          | ✅ ArgoCD + Argo Rollouts | ✅ ArgoCD (No Rollouts, but structured traffic shifting) |
-| **Sprint-Based Testing**         | ❌ Limited to feature flags | ✅ Separate cluster for beta testing |
-| **Cost Efficiency**              | ✅ Lower operational cost | ⚠️ Higher infra cost but optimized by shutting down unused cluster |
-
----
 
 ## **Approach 1: Single EKS Cluster**
 ```mermaid
