@@ -4,9 +4,9 @@
 |--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Scalability & Performance**  | ✅ Migrate to **AWS EKS** for Kubernetes-based auto-scaling (**Karpenter**) <br> ✅ Use **RabbitMQ** for asynchronous processing |
 | **Traffic Control & Routing**  | ✅ Use **Amazon Route 53** for **failover & latency-based routing** |
-| **Storage & Data Security**    | ✅ Store documents in **Amazon S3** (scalable, low latency) <br> ✅ **Encrypt documents** for security and compliance |
+| **Storage & Data Security**    | ✅ Store documents in **Amazon EFS** (scalable, low latency) <br> ✅ **Encrypt documents** for security and compliance |
 | **Security & Compliance**      | ✅ Implement **Kong API Gateway** for authentication & rate limiting |
-| **Reliability & Fault Tolerance** | ✅ Use **Route 53 failover** for high availability <br> ✅ Implement **offsite backups** in **AWS S3/Glacier** |
+| **Reliability & Fault Tolerance** | ✅ Use **Route 53 failover** for high availability <br> ✅ Implement **AWS Backup Service** for EFS backups |
 | **Deployment & Release Risks** | ✅ Adopt **Canary & Blue-Green Deployments** for safer rollouts and minimal downtime |
 | **Containerization & Portability** | ✅ **Dockerize applications** for consistency across environments <br> ✅ Deploy containers using **Amazon EKS** for managed **Kubernetes orchestration** |
 | **Service Mesh & Observability** | ✅ Integrate **Istio Service Mesh** for traffic management, security, and observability |
@@ -16,6 +16,7 @@
 ### **📞 Architecture Diagram**
 
 #### **Approach 1 (Single EKS Cluster with Istio Service Mesh)**
+
 ```mermaid
 graph LR
   subgraph "Mobile App"
@@ -39,8 +40,8 @@ graph LR
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
-      S3["Amazon S3 (Backups)"]
       MongoDB["MongoDB (Download URLs)"]
+      AWSBackup["AWS Backup Service (EFS)"]
     end
   end
 
@@ -53,11 +54,12 @@ graph LR
   EKS --> DocService
   DocService-- "Process, Encrypt, Store" --> EFS
   DocService-- "Store Encrypted Download URL" --> MongoDB
-  EFS-- "Backups to" --> S3
+  EFS-- "Backups to" --> AWSBackup
 
 ```
 
 #### **Approach 2 (Dual EKS Clusters per Sprint with Istio Service Mesh)**
+
 ```mermaid
 graph LR
   subgraph "Mobile App"
@@ -85,8 +87,8 @@ graph LR
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
-      S3["Amazon S3 (Backups)"]
       MongoDB["MongoDB (Download URLs)"]
+      AWSBackup["AWS Backup Service (EFS)"]
     end
   end
 
@@ -100,13 +102,14 @@ graph LR
   EKS2 --> DocService2
   DocService1 & DocService2-- "Process, Encrypt, Store" --> EFS
   DocService1 & DocService2-- "Store Encrypted Download URL" --> MongoDB
-  EFS-- "Backups to" --> S3
+  EFS-- "Backups to" --> AWSBackup
 
 ```
 
 ---
 
 ### **📊 Feature Comparison**
+
 | **Feature**                     | **Approach 1 (Single EKS Cluster with Istio)** | **Approach 2 (Dual EKS Clusters with Istio per Sprint)** |
 |----------------------------------|--------------------------------------------|---------------------------------------------|
 | **Traffic Control**              | ✅ Amazon Route 53 (low cost)              | ✅ Amazon Route 53 (low cost)               |
@@ -117,17 +120,10 @@ graph LR
 | **Scalability (Karpenter)** | ✅ Kubernetes-based auto-scaling (efficient cost) | ✅ Kubernetes-based auto-scaling (higher cost due to 2 clusters) |
 | **Sprint-Based Deployment**      | ❌ Single cluster handles all sprints     | ✅ One EKS for even sprints, one for odd (higher infra cost) |
 | **Async Processing**             | ✅ RabbitMQ (low cost per message processed) | ✅ Separate RabbitMQ per cluster (higher due to duplication) |
-| **Backup Strategy**              | ✅ AWS S3 + Glacier backups (low cost)    | ✅ AWS S3 + Glacier backups (low cost) |
+| **Backup Strategy**              | ✅ **AWS Backup Service for EFS** (more secure) | ✅ **AWS Backup Service for EFS** (more secure) |
 | **High Availability (HA)**       | ✅ Kubernetes redundancy & failover       | ✅ Multi-cluster redundancy (even/odd) (higher cost) |
 | **Resilience & Fault Tolerance** | ✅ Kubernetes cluster self-healing        | ✅ Two independent clusters for resilience |
 | **Service Mesh (Istio)**         | ✅ Centralized traffic control, observability, security | ✅ Separate Istio instances for each cluster (higher cost) |
 | **Cost Consideration 💰**        | 💲 **Optimized (Single EKS, scalable, moderate cost)** | 💲💲 **Higher (2x EKS clusters, better isolation)** |
 
 ---
-
-### **🚀 Recommended Approach**
-- **💰 Best cost-performance balance** → **Approach 1 (Single EKS Cluster with Istio).**
-- **🤖 Need structured sprint-based testing?** → **Approach 2 (Dual EKS Clusters with Istio).**
-- **🌟 Want to maximize cost savings?**
-    - **Use Approach 2** but **shutdown the Even EKS** after traffic shifts to Odd.
-
