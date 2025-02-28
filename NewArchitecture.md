@@ -112,22 +112,35 @@ graph LR
     subgraph "Networking & Security"
       Route53["Amazon Route 53 (Failover & Latency Routing)"]
       ALB["AWS ALB/NLB"]
-      Kong["Kong API Gateway (Auth, Rate Limiting)"]
+    end
+    subgraph "API Gateway Layer"
+      Kong_Odd["Kong API Gateway (Odd EKS)"]
+      Kong_Even["Kong API Gateway (Even EKS)"]
     end
     subgraph "Dual EKS Deployment (Redundant & Isolated Clusters)"
       subgraph "Active Cluster (Handles Live Traffic)"
-        EKS_Active["AWS EKS - Active (Even/Odd)"]
-        DocService_Active["Document Processor (Active)"]
-        StorageService_Active["Document Storage (Active)"]
-        NotificationService_Active["Notification Service (Active)"]
-        AmazonMQ_Active["Amazon MQ (Active)"]
+        EKS_Odd_Active["AWS EKS - Active (Odd Sprint)"]
+        EKS_Even_Active["AWS EKS - Active (Even Sprint)"]
+        DocService_Odd_Active["Document Processor (Odd Active)"]
+        DocService_Even_Active["Document Processor (Even Active)"]
+        StorageService_Odd_Active["Document Storage (Odd Active)"]
+        StorageService_Even_Active["Document Storage (Even Active)"]
+        NotificationService_Odd_Active["Notification Service (Odd Active)"]
+        NotificationService_Even_Active["Notification Service (Even Active)"]
+        AmazonMQ_Odd_Active["Amazon MQ (Odd Active)"]
+        AmazonMQ_Even_Active["Amazon MQ (Even Active)"]
       end
       subgraph "Passive Cluster (For Beta Testing & DR)"
-        EKS_Passive["AWS EKS - Passive (Even/Odd)"]
-        DocService_Passive["Document Processor (Passive)"]
-        StorageService_Passive["Document Storage (Passive)"]
-        NotificationService_Passive["Notification Service (Passive)"]
-        AmazonMQ_Passive["Amazon MQ (Passive)"]
+        EKS_Odd_Passive["AWS EKS - Passive (Odd Sprint)"]
+        EKS_Even_Passive["AWS EKS - Passive (Even Sprint)"]
+        DocService_Odd_Passive["Document Processor (Odd Passive)"]
+        DocService_Even_Passive["Document Processor (Even Passive)"]
+        StorageService_Odd_Passive["Document Storage (Odd Passive)"]
+        StorageService_Even_Passive["Document Storage (Even Passive)"]
+        NotificationService_Odd_Passive["Notification Service (Odd Passive)"]
+        NotificationService_Even_Passive["Notification Service (Even Passive)"]
+        AmazonMQ_Odd_Passive["Amazon MQ (Odd Passive)"]
+        AmazonMQ_Even_Passive["Amazon MQ (Even Passive)"]
       end
     end
     subgraph "Storage & Backup"
@@ -137,34 +150,54 @@ graph LR
     end
   end
 
+  %% Routing logic
   ProdUsers-- "Browse & Upload Documents" --> Route53
   BetaUsers-- "Browse & Upload Documents (Beta)" --> Route53
 
   Route53 --> ALB
-  ALB --> Kong
-  Kong --> EKS_Active & EKS_Passive
+  ALB -->|Odd Requests| Kong_Odd
+  ALB -->|Even Requests| Kong_Even
 
-  EKS_Active --> DocService_Active
-  EKS_Passive --> DocService_Passive
-  DocService_Active -->|"Send to Queue"| AmazonMQ_Active
-  DocService_Passive -->|"Send to Queue"| AmazonMQ_Passive
+  Kong_Odd --> EKS_Odd_Active & EKS_Odd_Passive
+  Kong_Even --> EKS_Even_Active & EKS_Even_Passive
 
-  AmazonMQ_Active -->|"Process Storage"| StorageService_Active
-  AmazonMQ_Passive -->|"Process Storage"| StorageService_Passive
+  EKS_Odd_Active --> DocService_Odd_Active
+  EKS_Even_Active --> DocService_Even_Active
+  EKS_Odd_Passive --> DocService_Odd_Passive
+  EKS_Even_Passive --> DocService_Even_Passive
 
-  StorageService_Active -->|"Save File"| EFS
-  StorageService_Passive -->|"Save File"| EFS
+  DocService_Odd_Active -->|"Send to Queue"| AmazonMQ_Odd_Active
+  DocService_Even_Active -->|"Send to Queue"| AmazonMQ_Even_Active
+  DocService_Odd_Passive -->|"Send to Queue"| AmazonMQ_Odd_Passive
+  DocService_Even_Passive -->|"Send to Queue"| AmazonMQ_Even_Passive
 
-  StorageService_Active -->|"Store URL"| MongoDB
-  StorageService_Passive -->|"Store URL"| MongoDB
+  AmazonMQ_Odd_Active -->|"Process Storage"| StorageService_Odd_Active
+  AmazonMQ_Even_Active -->|"Process Storage"| StorageService_Even_Active
+  AmazonMQ_Odd_Passive -->|"Process Storage"| StorageService_Odd_Passive
+  AmazonMQ_Even_Passive -->|"Process Storage"| StorageService_Even_Passive
+
+  StorageService_Odd_Active -->|"Save File"| EFS
+  StorageService_Even_Active -->|"Save File"| EFS
+  StorageService_Odd_Passive -->|"Save File"| EFS
+  StorageService_Even_Passive -->|"Save File"| EFS
+
+  StorageService_Odd_Active -->|"Store URL"| MongoDB
+  StorageService_Even_Active -->|"Store URL"| MongoDB
+  StorageService_Odd_Passive -->|"Store URL"| MongoDB
+  StorageService_Even_Passive -->|"Store URL"| MongoDB
 
   EFS-- "Backup to" --> AWSBackup
 
-  StorageService_Active -->|"Trigger Notification"| NotificationService_Active
-  StorageService_Passive -->|"Trigger Notification"| NotificationService_Passive
+  StorageService_Odd_Active -->|"Trigger Notification"| NotificationService_Odd_Active
+  StorageService_Even_Active -->|"Trigger Notification"| NotificationService_Even_Active
+  StorageService_Odd_Passive -->|"Trigger Notification"| NotificationService_Odd_Passive
+  StorageService_Even_Passive -->|"Trigger Notification"| NotificationService_Even_Passive
 
-  NotificationService_Active -->|"Send Push Notification"| ProdUsers
-  NotificationService_Passive -->|"Send Push Notification"| BetaUsers
+  NotificationService_Odd_Active -->|"Send Push Notification"| ProdUsers
+  NotificationService_Even_Active -->|"Send Push Notification"| ProdUsers
+  NotificationService_Odd_Passive -->|"Send Push Notification"| BetaUsers
+  NotificationService_Even_Passive -->|"Send Push Notification"| BetaUsers
+
 
 ```
 
