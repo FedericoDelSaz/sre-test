@@ -16,7 +16,7 @@
 
 ### **📞 Architecture Diagram**
 
-#### ** Single EKS Cluster with Istio Service Mesh **
+#### **Single EKS Cluster with Istio Service Mesh**
 
 ```mermaid
 graph LR
@@ -38,6 +38,7 @@ graph LR
     subgraph "Compute"
       EKS["AWS EKS (Kubernetes Cluster)"]
       DocService["Document Processor Service"]
+      DocStorage["Document Storage Service"]
       NotificationService["Notification Service"]
       AmazonMQ["Amazon MQ (RabbitMQ)"]
     end
@@ -55,13 +56,41 @@ graph LR
   Kong --> Istio
   Istio --> EKS
   EKS --> DocService
-  DocService-- "Process, Encrypt, Store" --> EFS
-  DocService-- "Store Encrypted Download URL" --> MongoDB
   DocService-- "Queue Processing" --> AmazonMQ
-  EFS-- "Backups to" --> AWSBackup
-  EKS --> NotificationService
+  DocStorage-- "Listening for Messages" --> AmazonMQ
+  DocStorage-- "Process, Encrypt, Store" --> EFS
+  DocStorage-- "Store Encrypted Download URL" --> MongoDB
+  DocStorage-- "Send Push Notification with Download URL" --> NotificationService
   NotificationService-- "Send Push Notifications" --> Drivers
+  EFS-- "Backups to" --> AWSBackup
 ```
+
+---
+
+### **Process Flow**
+
+1. **Drivers & Agents** interact with the system through **Amazon Route 53** and **Kong API Gateway**.
+2. **Document Processor Service** receives document upload requests and pushes processing tasks to **Amazon MQ (RabbitMQ)**.
+3. **Document Storage Service** listens for messages from **Amazon MQ**, processes documents, encrypts them, and stores them in **Amazon EFS**.
+4. **Document Storage Service** stores the encrypted document’s **download URL** in **MongoDB**.
+5. Once the document is stored, **Document Storage Service** sends a push notification to the mobile app via **Firebase Cloud Messaging (FCM)**.
+6. Users receive a notification with a **download link** to access the stored document.
+7. **AWS Backup Service** ensures periodic backups of **Amazon EFS** for disaster recovery.
+
+---
+
+### **✅ Key Benefits**
+
+- **Highly Scalable**: Uses **Kubernetes auto-scaling** via **AWS EKS** and **Karpenter**.
+- **Efficient Traffic Management**: Powered by **Amazon Route 53**, **ALB**, and **Istio Service Mesh**.
+- **Secure & Compliant**: Encryption, **Kong API Gateway**, and **EFS encryption** ensure data security.
+- **Reliable & Fault-Tolerant**: Uses **Amazon MQ** for async processing, **AWS Backup Service** for redundancy.
+- **Mobile-Friendly**: Supports **Firebase Cloud Messaging** for instant user notifications.
+
+---
+
+
+
 
 #### ** Dual EKS Clusters per Sprint with Istio Service Mesh **
 
@@ -89,6 +118,8 @@ graph LR
       end
       DocService1["Document Processor Service (Even Sprint)"]
       DocService2["Document Processor Service (Odd Sprint)"]
+      StorageService1["Document Storage Service (Even Sprint)"]
+      StorageService2["Document Storage Service (Odd Sprint)"]
       NotificationService1["Notification Service (Even Sprint)"]
       NotificationService2["Notification Service (Odd Sprint)"]
       AmazonMQ1["Amazon MQ (RabbitMQ) - Even Sprint"]
@@ -109,15 +140,16 @@ graph LR
   Istio --> EKS1 & EKS2
   EKS1 --> DocService1
   EKS2 --> DocService2
-  EKS1 --> NotificationService1
-  EKS2 --> NotificationService2
-  DocService1 & DocService2-- "Process, Encrypt, Store" --> EFS
-  DocService1 & DocService2-- "Store Encrypted Download URL" --> MongoDB
-  DocService1 --> AmazonMQ1
-  DocService2 --> AmazonMQ2
+  DocService1 -->|"Send to Queue"| AmazonMQ1
+  DocService2 -->|"Send to Queue"| AmazonMQ2
+  AmazonMQ1 -->|"Listen & Process"| StorageService1
+  AmazonMQ2 -->|"Listen & Process"| StorageService2
+  StorageService1 & StorageService2 -->|"Store Document"| EFS
+  StorageService1 & StorageService2 -->|"Save Download URL"| MongoDB
   EFS-- "Backups to" --> AWSBackup
-  NotificationService1-- "Send Push Notifications" --> Drivers
-  NotificationService2-- "Send Push Notifications" --> Drivers
+  StorageService1 & StorageService2 -->|"Trigger Notification"| NotificationService1 & NotificationService2
+  NotificationService1 & NotificationService2 -->|"Send Push Notification (Download URL)"| Drivers
+
 ```
 
 ---
