@@ -17,79 +17,91 @@
 
 #### **Approach 1 (Single EKS Cluster with Istio Service Mesh)**
 ```mermaid
-graph TD;
-  
-  subgraph AWS_Cloud
-    subgraph Networking
-      A[Amazon Route 53] -->|Failover & Latency Routing| B[ALB/NLB]
+graph LR
+  subgraph "Mobile App"
+  Drivers["Driver"]
+  end
+  subgraph "Desktop App"
+  Agents["Customer Service Agents"]
+  end
+  subgraph "AWS Cloud"
+    subgraph "Networking"
+      Route53["Amazon Route 53"]
+      ALB["ALB/NLB"]
     end
-    
-    subgraph Security
-      C[Kong API Gateway] -->|Auth, Rate Limiting| B
+    subgraph "Security"
+      Kong["Kong API Gateway"]
+      Istio["Istio Service Mesh"]
     end
-
-    subgraph Compute
-      F[AWS EKS (Kubernetes Cluster)] -->|Containerized Backend| G[Dockerized Microservices]
-      G -->|Async Processing| H[RabbitMQ]
-      G -->|Service Mesh| I[Istio Service Mesh]
+    subgraph "Compute"
+      EKS["AWS EKS (Kubernetes Cluster)"]
+      DocService["Document Processor Service"]
     end
-
-    subgraph Storage
-      J[AWS S3] -->|Encrypted Storage| K[Data Lake / Documents]
-      K -->|Backups| L[AWS Glacier]
-    end
-
-    subgraph Deployment
-      M[CI/CD Pipeline] -->|Triggers Deployment| N[ArgoCD]
-      N -->|Manages Rollouts| O[Argo Rollouts]
-      O -->|Progressive Delivery| F
+    subgraph "Storage"
+      EFS["Amazon EFS (Encrypted)"]
+      S3["Amazon S3 (Backups)"]
+      MongoDB["MongoDB (Download URLs)"]
     end
   end
-  
-  A -->|Traffic Control| C
-  B --> F
-  F --> J
+
+  Drivers-- "Browse and Upload Documents API" -->Route53
+  Agents-- "Browse and Administer Documents API" -->Route53
+  Route53 --> ALB
+  ALB --> Kong
+  Kong --> Istio
+  Istio --> EKS
+  EKS --> DocService
+  DocService-- "Process, Encrypt, Store" --> EFS
+  DocService-- "Store Encrypted Download URL" --> MongoDB
+  EFS-- "Backups to" --> S3
+
 ```
 
 #### **Approach 2 (Dual EKS Clusters per Sprint with Istio Service Mesh)**
 ```mermaid
-graph TD;
-  
-  subgraph AWS_Cloud
-    subgraph Networking
-      A[Amazon Route 53] -->|Failover & Latency Routing| B[ALB/NLB]
+graph LR
+  subgraph "Mobile App"
+    Drivers["Driver"]
+  end
+  subgraph "Desktop App"
+    Agents["Customer Service Agents"]
+  end
+  subgraph "AWS Cloud"
+    subgraph "Networking"
+      Route53["Amazon Route 53 (Failover & Latency Routing)"]
+      ALB["ALB/NLB"]
     end
-    
-    subgraph Security
-      C[Kong API Gateway] -->|Auth, Rate Limiting| B
+    subgraph "Security"
+      Kong["Kong API Gateway"]
+      Istio["Istio Service Mesh"]
     end
-
-    subgraph Compute
-      subgraph Europe_Region
-        F1[AWS EKS - Even Sprint Cluster] -->|Containerized Backend| G1[Dockerized Microservices (Even)]
-        F2[AWS EKS - Odd Sprint Cluster] -->|Containerized Backend| G2[Dockerized Microservices (Odd)]
-        G1 -->|Async Processing| H1[RabbitMQ (Even)]
-        G2 -->|Async Processing| H2[RabbitMQ (Odd)]
-        G1 -->|Service Mesh| I1[Istio Service Mesh (Even)]
-        G2 -->|Service Mesh| I2[Istio Service Mesh (Odd)]
+    subgraph "Compute"
+      subgraph "Europe Region"
+        EKS1["AWS EKS - Even Sprint Cluster"]
+        EKS2["AWS EKS - Odd Sprint Cluster"]
       end
+      DocService1["Document Processor Service (Even Sprint)"]
+      DocService2["Document Processor Service (Odd Sprint)"]
     end
-
-    subgraph Storage
-      J[AWS S3] -->|Encrypted Storage| K[Data Lake / Documents]
-      K -->|Backups| L[AWS Glacier]
-    end
-
-    subgraph Deployment
-      M[CI/CD Pipeline] -->|Triggers Deployment| N[ArgoCD]
-      N -->|Deploys to Even Sprint Cluster| F1
-      N -->|Deploys to Odd Sprint Cluster| F2
+    subgraph "Storage"
+      EFS["Amazon EFS (Encrypted)"]
+      S3["Amazon S3 (Backups)"]
+      MongoDB["MongoDB (Download URLs)"]
     end
   end
-  
-  A -->|Traffic Control| C
-  B -->|Routes Traffic| F1 & F2
-  F1 & F2 --> J
+
+  Drivers-- "Browse and Upload Documents API" -->Route53
+  Agents-- "Browse and Administer Documents API" -->Route53
+  Route53 --> ALB
+  ALB --> Kong
+  Kong --> Istio
+  Istio --> EKS1 & EKS2
+  EKS1 --> DocService1
+  EKS2 --> DocService2
+  DocService1 & DocService2-- "Process, Encrypt, Store" --> EFS
+  DocService1 & DocService2-- "Store Encrypted Download URL" --> MongoDB
+  EFS-- "Backups to" --> S3
+
 ```
 
 ---
