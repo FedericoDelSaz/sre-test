@@ -2,7 +2,7 @@
 ### **Key Components**
 - **AWS EKS (Kubernetes) for containerized microservices**
 - **Amazon Route 53 for traffic routing**
-- **Kong API Gateway + AWS WAF + AWS Shield for security**
+- **Kong API Gateway for security & rate limiting**
 - **RabbitMQ for async processing**
 - **AWS S3 (encrypted) + AWS Glacier for storage & backups**
 - **ArgoCD + Argo Rollouts for CI/CD deployments**
@@ -14,7 +14,7 @@
 | **Feature**                     | **Approach 1: Single EKS Cluster**  | **Approach 2: Dual EKS Clusters (Even/Odd Sprints)** |
 |----------------------------------|-------------------------------------|-----------------------------------------------------|
 | **Traffic Control**              | ✅ Route 53 (Failover & Latency Routing) | ✅ Route 53 (Weighted Traffic Shifting) |
-| **Security**                     | ✅ Kong API Gateway + AWS WAF + Shield | ✅ Kong API Gateway + AWS WAF + Shield (2 clusters) |
+| **Security**                     | ✅ Kong API Gateway | ✅ Kong API Gateway (2 clusters) |
 | **Scalability**                   | ✅ Kubernetes auto-scaling + Karpenter | ✅ Kubernetes auto-scaling + Karpenter |
 | **Deployment Strategy**          | ✅ ArgoCD + Argo Rollouts | ✅ ArgoCD (No Rollouts, but structured traffic shifting) |
 | **Sprint-Based Testing**         | ❌ Limited to feature flags | ✅ Separate cluster for beta testing |
@@ -32,19 +32,18 @@ graph TD;
     end
     
     subgraph Security
-      C[Kong API Gateway] -->|Auth, Rate Limiting| D[AWS WAF]
-      D -->|DDoS Protection| E[AWS Shield]
+      C[Kong API Gateway] -->|Auth, Rate Limiting| B
     end
 
     subgraph Compute
       F[AWS EKS (Single Cluster)] -->|Containerized Backend| G[Dockerized Microservices]
       G -->|Async Processing| H[RabbitMQ]
-      F -->|Dynamic Node Scaling| K[Karpenter Auto-Scaling]
+      F -->|Dynamic Node Scaling| Karpenter[Karpenter Auto-Scaling]
     end
 
     subgraph Storage
       I[AWS S3] -->|Encrypted Storage| J[Data Lake / Documents]
-      J -->|Backups| K[AWS Glacier]
+      J -->|Backups| Glacier[AWS Glacier]
     end
 
     subgraph Deployment
@@ -55,8 +54,8 @@ graph TD;
   end
   
   A -->|Traffic Control| C
-  B --> F
   C --> B
+  B --> F
   F --> I
 
 ```
@@ -73,8 +72,7 @@ graph TD;
     end
     
     subgraph Security
-      C[Kong API Gateway] -->|Auth, Rate Limiting| D[AWS WAF]
-      D -->|DDoS Protection| E[AWS Shield]
+      C[Kong API Gateway] -->|Auth, Rate Limiting| B
     end
 
     subgraph Compute
@@ -101,9 +99,7 @@ graph TD;
   
   A -->|Traffic Control| C
   B -->|Routes Traffic| F1 & F2
-  C --> B
   F1 & F2 --> I
-
 ```
 
 ---
@@ -113,3 +109,4 @@ graph TD;
 - **For structured, sprint-based testing & risk mitigation** → **Approach 2 (Dual EKS Clusters + Traffic Weight Shifting).**
 
 Approach 2 is **preferred for production** if **beta validation before rollout** is a priority.
+
