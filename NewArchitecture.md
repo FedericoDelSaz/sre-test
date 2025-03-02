@@ -41,10 +41,11 @@ graph LR
       DocStorage["Document Storage Service"]
       NotificationService["Notification Service"]
       AmazonMQ["Amazon MQ (RabbitMQ)"]
+      UserService["User Service"]
     end
     subgraph "Storage"
       EFS["Amazon EFS (Encrypted)"]
-      MongoDB["MongoDB (Download URLs)"]
+      MongoDB["MongoDB (User Data & Download URLs)"]
       AWSBackup["AWS Backup Service (EFS)"]
     end
   end
@@ -56,6 +57,7 @@ graph LR
   Kong --> Istio
   Istio --> EKS
   EKS --> DocService
+  EKS --> UserService
   DocService-- "Queue Processing" --> AmazonMQ
   DocStorage-- "Listening for Messages" --> AmazonMQ
   DocStorage-- "Process, Encrypt, Store" --> EFS
@@ -63,6 +65,8 @@ graph LR
   DocStorage-- "Send Push Notification with Download URL" --> NotificationService
   NotificationService-- "Send Push Notifications" --> Drivers
   EFS-- "Backups to" --> AWSBackup
+  UserService-- "Manage User Data" --> MongoDB
+
 ```
 
 ---
