@@ -123,27 +123,26 @@ graph LR
     subgraph "EKS Deployment (Handles Live Traffic)"
       subgraph "Odd Sprint Cluster"
         EKS_Odd["AWS EKS - Odd Sprint"]
+        UserService_Odd["User Manager (Odd)"]
         DocService_Odd["Document Processor (Odd)"]
         StorageService_Odd["Document Storage (Odd)"]
         NotificationService_Odd["Notification Service (Odd)"]
         AmazonMQ_Odd["Amazon MQ (Odd)"]
-        UserService_Odd["User Service (Odd)"]
-        Redis_Odd["Redis (User Cache - Odd)"]
       end
       subgraph "Even Sprint Cluster"
         EKS_Even["AWS EKS - Even Sprint"]
+        UserService_Even["User Manager (Even)"]
         DocService_Even["Document Processor (Even)"]
         StorageService_Even["Document Storage (Even)"]
         NotificationService_Even["Notification Service (Even)"]
         AmazonMQ_Even["Amazon MQ (Even)"]
-        UserService_Even["User Service (Even)"]
-        Redis_Even["Redis (User Cache - Even)"]
       end
     end
     subgraph "Storage & Backup"
       EFS["Amazon EFS (Encrypted)"]
       MongoDB["MongoDB (Download URLs)"]
       AWSBackup["AWS Backup Service"]
+      AmazonElastiCache["User Redis"]
     end
   end
 
@@ -159,30 +158,6 @@ graph LR
 
   Kong_Odd --> EKS_Odd
   Kong_Even --> EKS_Even
-
-  EKS_Odd --> DocService_Odd
-  EKS_Even --> DocService_Even
-
-  EKS_Odd --> UserService_Odd
-  EKS_Even --> UserService_Even
-
-  UserService_Odd --> Redis_Odd
-  UserService_Even --> Redis_Even
-
-  DocService_Odd --> StorageService_Odd
-  DocService_Even --> StorageService_Even
-
-  StorageService_Odd --> EFS
-  StorageService_Even --> EFS
-
-  DocService_Odd --> AmazonMQ_Odd
-  DocService_Even --> AmazonMQ_Even
-
-  NotificationService_Odd --> ProdUsers
-  NotificationService_Even --> BetaUsers
-
-  EFS --> AWSBackup
-  MongoDB --> AWSBackup
 
 ```
 
