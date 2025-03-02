@@ -33,7 +33,6 @@ graph LR
     end
     subgraph "Security"
       Kong["Kong API Gateway"]
-      Istio["Istio Service Mesh"]
     end
     subgraph "Compute"
       EKS["AWS EKS (Kubernetes Cluster)"]
@@ -54,8 +53,7 @@ graph LR
   Agents-- "Browse and Administer Documents API" -->Route53
   Route53 --> ALB
   ALB --> Kong
-  Kong --> Istio
-  Istio --> EKS
+  Kong --> EKS
   EKS --> DocService
   EKS --> UserService
   DocService-- "Queue Processing" --> AmazonMQ
@@ -66,6 +64,7 @@ graph LR
   NotificationService-- "Send Push Notifications" --> Drivers
   EFS-- "Backups to" --> AWSBackup
   UserService-- "Manage User Data" --> MongoDB
+
 
 ```
 
