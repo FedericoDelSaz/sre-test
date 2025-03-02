@@ -33,7 +33,6 @@ graph LR
     end
     subgraph "Security"
       Kong["Kong API Gateway"]
-      AccessControl["AccessControl Service"]
     end
     subgraph "Compute"
       EKS["AWS EKS (Kubernetes Cluster)"]
@@ -55,8 +54,7 @@ graph LR
   Agents-- "Browse and Administer Documents API" -->Route53
   Route53 --> ALB
   ALB --> Kong
-  Kong --> AccessControl
-  AccessControl --> EKS
+  Kong --> EKS
   EKS --> DocService
   EKS --> UserService
   DocService-- "Queue Processing" --> AmazonMQ
@@ -68,7 +66,7 @@ graph LR
   EFS-- "Backups to" --> AWSBackup
   UserService-- "Store User Data" --> MongoDB
   UserService-- "Cache User Data" --> Redis
-  AccessControl-- "Verify User Roles and Permissions" --> MongoDB
+
 
 ```
 
