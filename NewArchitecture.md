@@ -87,8 +87,8 @@ graph LR
 ### **✅ Key Benefits**
 
 - **Highly Scalable**: Uses **Kubernetes auto-scaling** via **AWS EKS** and **Karpenter**.
-- **Efficient Traffic Management**: Powered by **Amazon Route 53**, **ALB**, and **Istio Service Mesh**.
-- **Secure & Compliant**: Encryption, **Kong API Gateway**, and **EFS encryption** ensure data security.
+- **Efficient Traffic Management**: Powered by **Amazon Route 53**, **ALB**, **Kong API Gateway** and **Istio Service Mesh**.
+- **Secure & Compliant**: Encryption, and **EFS encryption** ensure data security.
 - **Reliable & Fault-Tolerant**: Uses **Amazon MQ** for async processing, **AWS Backup Service** for redundancy.
 - **Mobile-Friendly**: Supports **Firebase Cloud Messaging** for instant user notifications.
 
@@ -127,6 +127,8 @@ graph LR
         StorageService_Odd["Document Storage (Odd)"]
         NotificationService_Odd["Notification Service (Odd)"]
         AmazonMQ_Odd["Amazon MQ (Odd)"]
+        UserService_Odd["User Service (Odd)"]
+        Redis_Odd["Redis (User Cache - Odd)"]
       end
       subgraph "Even Sprint Cluster"
         EKS_Even["AWS EKS - Even Sprint"]
@@ -134,6 +136,8 @@ graph LR
         StorageService_Even["Document Storage (Even)"]
         NotificationService_Even["Notification Service (Even)"]
         AmazonMQ_Even["Amazon MQ (Even)"]
+        UserService_Even["User Service (Even)"]
+        Redis_Even["Redis (User Cache - Even)"]
       end
     end
     subgraph "Storage & Backup"
@@ -156,6 +160,30 @@ graph LR
   Kong_Odd --> EKS_Odd
   Kong_Even --> EKS_Even
 
+  EKS_Odd --> DocService_Odd
+  EKS_Even --> DocService_Even
+
+  EKS_Odd --> UserService_Odd
+  EKS_Even --> UserService_Even
+
+  UserService_Odd --> Redis_Odd
+  UserService_Even --> Redis_Even
+
+  DocService_Odd --> StorageService_Odd
+  DocService_Even --> StorageService_Even
+
+  StorageService_Odd --> EFS
+  StorageService_Even --> EFS
+
+  DocService_Odd --> AmazonMQ_Odd
+  DocService_Even --> AmazonMQ_Even
+
+  NotificationService_Odd --> ProdUsers
+  NotificationService_Even --> BetaUsers
+
+  EFS --> AWSBackup
+  MongoDB --> AWSBackup
+
 ```
 
 ### **Key Takeaways**
@@ -166,4 +194,4 @@ graph LR
 
 ---
 
-**[Return to the index.](./Solution.md)**
+**[Return to the index](./Solution.md) ↩️**

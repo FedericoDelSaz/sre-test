@@ -12,7 +12,7 @@
 ✅ Dockerize applications while keeping them in VMs.
 
 ### **🔹 Phase 4: Migration to EKS**
-✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth**.  
+✅ Deploy **EKS cluster + Kong API Gateway + Rate Limit + OAuth + ALC**.  
 ✅ **Istio Service Mesh** for traffic control & security.  
 ✅ Deploy **Amazon MQ**.
 
@@ -27,6 +27,7 @@
 ✅ Gradually migrate workloads from VMs to EKS.
 - **Document Processor Service**
 - **Document Storage Service**
+- **User Service + Redis**
 - **MongoDB** to store **encrypted document URLs** for secure downloads.
 
 ### **🔹 Phase 6: Monitoring & Logging Implementation**
@@ -53,4 +54,4 @@
 ✅ **Enhanced Security** via **Istio Service Mesh, Kong OAuth & Rate Limiting, Kyverno & Secret Manager**.  
 ✅ **Real-time Mobile Notifications** using **Firebase & a Notification Service in EKS**.
 
-**[Return to the index.](./Solution.md)**
+**[Return to the index](./Solution.md) ↩️**
