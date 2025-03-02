@@ -46,6 +46,7 @@ graph LR
       EFS["Amazon EFS (Encrypted)"]
       MongoDB["MongoDB (User Data & Download URLs)"]
       AWSBackup["AWS Backup Service (EFS)"]
+      Redis["Redis (User Cache)"]
     end
   end
 
@@ -63,9 +64,9 @@ graph LR
   DocStorage-- "Send Push Notification with Download URL" --> NotificationService
   NotificationService-- "Send Push Notifications" --> Drivers
   EFS-- "Backups to" --> AWSBackup
-  UserService-- "Manage User Data" --> MongoDB
-
-
+  UserService-- "Store User Data" --> MongoDB
+  UserService-- "Cache User Data" --> Redis
+  UserService-- "Query Cached User Data First" --> Redis
 ```
 
 ---
