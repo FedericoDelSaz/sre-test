@@ -11,7 +11,6 @@
 | **Containerization & Portability** | ✅ **Dockerize applications** for consistency across environments <br> ✅ Deploy containers using **Amazon EKS** for managed **Kubernetes orchestration** |
 | **Service Mesh & Observability** | ✅ Integrate **Istio Service Mesh** for traffic management, security, and observability |
 | **Mobile Notifications**       | ✅ Add **NotificationService** to send notifications to the mobile app via **Firebase Cloud Messaging (FCM)** |
-| **Document URL Management**    | ✅ Store document URLs in **MongoDB Atlas** for easy access and retrieval of metadata |
 
 ---
 
