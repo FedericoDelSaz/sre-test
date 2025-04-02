@@ -1,24 +1,8 @@
 # SRE Architecture Test
 
-Thank you very much (again!) for your interest in the Site Reliability
-Engineer position at Cabify. We really appreciate the effort you took on
-delivering the Code Test.
-
-Get yourself comfortable and make sure to double check the test requirements.
-
-You will have two weeks of time to complete the test. We would normally
-expect you to work on this no more than 2-3 hours, but you probably have other
-things to do in your life so we want to give you plenty of time in case you want
-to take on the challenge. If you don't, then it's perfectly fine. Just please
-let us know if this is the case.
-
-If you have any questions about anything, please do not hesitate to ask us: better safe than sorry!
-
-Looking forward to seeing the results. Good luck!
-
 ### Problem
 
-At Cabify, we need to gather some specific documentation from our Drivers in order
+We need to gather some specific documentation from our Drivers in order
 to comply with the law (IDs, car's licence plates, etc). These documents are managed
 on a later stage by our Customer Service agents.
 
@@ -28,7 +12,7 @@ is used by both Drivers (via mobile phone) and Customer Service agents (via web 
 The `Document processor` application consists of three different parts:
 
 - A backend service implementing an API
-- A specific UI within the Cabify mobile applications that talk to the backend's API
+- A specific UI within the mobile applications that talk to the backend's API
 - An internal UI for our Customer Service team that talk to the backend's API
 
 Our Drivers numbers are increasing quickly as the company lands on many different
